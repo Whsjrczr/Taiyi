@@ -3,7 +3,7 @@ from collections import defaultdict
 import torch
 import torch.nn as nn
 
-from model import  Model
+from model_taiyi import  Model
 from Taiyi.taiyi.monitor import Monitor
 import wandb
 from Taiyi.visualize import Visualization

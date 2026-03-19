@@ -13,6 +13,7 @@ from .input_cov_max_eig import InputCovMaxEig
 from .weight_grad_norm import WeightGradNorm
 from .linear_dead_neuron_num import LinearDeadNeuronNum
 from .rankme import RankMe
+from .input_angle import InputAngleStd, InputAngleMean
 
 
 
