@@ -118,10 +118,28 @@ class TransformerEncoderLayer(nn.Module):
         self.norm2 = nn.LayerNorm(d_model)
 
     def forward(self, src, src_mask=None, src_key_padding_mask=None):
-        src2 = self.self_attn(src, src, src, attn_mask=src_mask,
-                              key_padding_mask=src_key_padding_mask)[0]
-        src = src + self.dropout(self.linear2(self.dropout(torch.relu(self.linear1(self.norm1(src2))))))
+        attn_stream = src
+        attn_branch = self.self_attn(
+            src, src, src, attn_mask=src_mask, key_padding_mask=src_key_padding_mask
+        )[0]
+        src = attn_stream + attn_branch
+
+        mlp_stream = src
+        mlp_branch = self.dropout(self.linear2(self.dropout(torch.relu(self.linear1(self.norm1(src))))))
+        src = mlp_stream + mlp_branch
         src = self.norm2(src)
+        self.residual_states = {
+            "attn": {
+                "stream": attn_stream,
+                "branch": attn_branch,
+                "output": attn_stream + attn_branch,
+            },
+            "mlp": {
+                "stream": mlp_stream,
+                "branch": mlp_branch,
+                "output": src,
+            },
+        }
         return src
 
 
@@ -167,3 +185,73 @@ class ViT(nn.Module):
 if __name__ == '__main__':
     vit = ViT()
     print(vit)
+
+
+class ResidualMonitorMixin:
+    """Minimal helper for exposing residual states to Taiyi."""
+
+    def _set_single_residual_state(self, stream, branch, output):
+        self.residual_states = {
+            "default": {
+                "stream": stream,
+                "branch": branch,
+                "output": output,
+            }
+        }
+
+    def _set_multi_residual_state(self, **states):
+        self.residual_states = states
+
+
+class MinimalResidualBlock(nn.Module, ResidualMonitorMixin):
+    """Template for a single residual add."""
+
+    def __init__(self, dim, activation=nn.ReLU):
+        super().__init__()
+        self.fc = nn.Linear(dim, dim)
+        self.act = activation()
+
+    def forward(self, x):
+        stream = x
+        branch = self.act(self.fc(x))
+        output = stream + branch
+        self._set_single_residual_state(stream, branch, output)
+        return output
+
+
+class MinimalTransformerResidualBlock(nn.Module, ResidualMonitorMixin):
+    """Template for blocks that contain multiple residual adds."""
+
+    def __init__(self, dim, hidden_dim):
+        super().__init__()
+        self.norm1 = nn.LayerNorm(dim)
+        self.attn = nn.Linear(dim, dim)
+        self.norm2 = nn.LayerNorm(dim)
+        self.mlp = nn.Sequential(
+            nn.Linear(dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, dim),
+        )
+
+    def forward(self, x):
+        attn_stream = x
+        attn_branch = self.attn(self.norm1(x))
+        x = attn_stream + attn_branch
+
+        mlp_stream = x
+        mlp_branch = self.mlp(self.norm2(x))
+        x = mlp_stream + mlp_branch
+
+        self._set_multi_residual_state(
+            attn={
+                "stream": attn_stream,
+                "branch": attn_branch,
+                "output": attn_stream + attn_branch,
+            },
+            mlp={
+                "stream": mlp_stream,
+                "branch": mlp_branch,
+                "output": x,
+            },
+        )
+        return x

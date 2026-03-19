@@ -2,6 +2,7 @@
 结果可视化类，暂时通过第三方软件进行展示
 """
 from collections import defaultdict
+import numpy
 from .figure import Surface3d
 
 
@@ -28,12 +29,7 @@ class Visualization:
                     continue
                 key = module_name + '_' + quantity_name
                 val = self._get_result(module_name, quantity_name, step)
-                if val.size == 1:
-                    val = val.item()
-                else:
-                    val = self._get_result(module_name, quantity_name)
-                    val = Surface3d(val, key)
-                logs[key] = val
+                logs.update(self._format_log_value(key, module_name, quantity_name, val))
         if ext is not None:
             logs.update(ext)
         self.vis.log(logs)
@@ -62,3 +58,19 @@ class Visualization:
         else:
             value = self.monitor.get_output()[module_name][quantity_name]
         return value
+
+    def _format_log_value(self, key, module_name, quantity_name, value):
+        if isinstance(value, dict):
+            logs = {}
+            for child_key, child_value in value.items():
+                logs.update(self._format_log_value(f"{key}_{child_key}", module_name, quantity_name, child_value))
+            return logs
+
+        if isinstance(value, numpy.ndarray) and value.size == 1:
+            return {key: value.item()}
+
+        if isinstance(value, (float, int, numpy.float32, numpy.float64)):
+            return {key: value}
+
+        history = self._get_result(module_name, quantity_name)
+        return {key: Surface3d(history, key)}
