@@ -182,6 +182,15 @@ Taiyi now supports residual-angle monitoring for residual blocks that expose a u
 | `ResidualInputAngleStd` | Std of the angle between the two inputs of a residual add | `stream`, `branch` |
 | `ResidualStreamOutputAngleMean` | Mean angle between the residual stream and the residual output | `stream`, `output` |
 | `ResidualStreamOutputAngleStd` | Std of the angle between the residual stream and the residual output | `stream`, `output` |
+| `ResidualEnergyRatio` | Mean residual-branch energy ratio `||branch||^2 / (||stream||^2 + ||branch||^2)` | `stream`, `branch` |
+
+Residual quantities can be grouped as:
+
+| Category | Quantities | What they measure |
+| --- | --- | --- |
+| Direction | `ResidualInputAngleMean/Std` | Relative direction between skip stream and residual branch |
+| Direction | `ResidualStreamOutputAngleMean/Std` | Direction change from skip stream to final residual output |
+| Energy | `ResidualEnergyRatio` | Relative magnitude contribution of residual branch versus skip stream |
 
 Definitions:
 
