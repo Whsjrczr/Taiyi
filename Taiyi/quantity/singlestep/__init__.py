@@ -1,5 +1,6 @@
 from .input_norm import InputSndNorm
 from .output_grad_norm import OutputGradSndNorm
+from .output_grad_range import OutputGradRange
 from .input_angle import InputAngleMean, InputAngleStd
 from .input_mean import InputMean
 from .input_std import InputStd
@@ -26,6 +27,7 @@ from .residual_energy_ratio import ResidualEnergyRatio
 __all__ = [
     'InputSndNorm',
     'OutputGradSndNorm',
+    'OutputGradRange',
     'InputAngleMean',
     'InputAngleStd',
     'InputMean',
