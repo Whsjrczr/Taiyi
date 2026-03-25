@@ -1,3 +1,5 @@
+import torch
+
 from .base_class import SingleStepQuantity
 
 
@@ -7,6 +9,8 @@ class WeightGradRange(SingleStepQuantity):
         weight = getattr(self._module, "weight", None)
         grad = None if weight is None else weight.grad
         if grad is None:
+            return None
+        if not torch.isfinite(grad).all():
             return None
         return {
             "min": grad.min(),
