@@ -11,6 +11,7 @@ from .input_cov_max_eig import InputCovMaxEig
 from .input_cov_stable_rank import InputCovStableRank
 from .weight_norm import WeightNorm
 from .weight_grad_norm import WeightGradNorm
+from .weight_grad_range import WeightGradRange
 from .linear_dead_neuron_num import LinearDeadNeuronNum
 from .rankme import RankMe
 from .residual_angle import (
@@ -37,6 +38,7 @@ __all__ = [
     'InputCovStableRank',
     'WeightNorm',
     'WeightGradNorm',
+    'WeightGradRange',
     'LinearDeadNeuronNum',
     'RankMe',
     'ResidualInputAngleMean',
