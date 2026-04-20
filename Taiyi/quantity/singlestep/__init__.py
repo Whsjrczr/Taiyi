@@ -4,6 +4,8 @@ from .output_grad_range import OutputGradRange
 from .input_angle import InputAngleMean, InputAngleStd
 from .input_mean import InputMean
 from .input_std import InputStd
+from .input_value_histogram import InputValueHistogram
+from .input_norm_contribution import InputNormContribution
 from .input_cov_condition import InputCovCondition
 from .input_cov_condition20 import InputCovCondition20
 from .input_cov_condition50 import InputCovCondition50
@@ -32,6 +34,8 @@ __all__ = [
     'InputAngleStd',
     'InputMean',
     'InputStd',
+    'InputValueHistogram',
+    'InputNormContribution',
     'InputCovCondition',
     'InputCovCondition20',
     'InputCovCondition50',
