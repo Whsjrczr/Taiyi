@@ -24,6 +24,7 @@ from .residual_angle import (
     ResidualStreamOutputAngleStd,
 )
 from .residual_energy_ratio import ResidualEnergyRatio
+from .vit_diagnostics import ViTLogitsStats, ViTNormStats, ViTResidualStats
 
 
 __all__ = [
@@ -52,4 +53,7 @@ __all__ = [
     'ResidualStreamOutputAngleMean',
     'ResidualStreamOutputAngleStd',
     'ResidualEnergyRatio',
+    'ViTLogitsStats',
+    'ViTNormStats',
+    'ViTResidualStats',
 ]
